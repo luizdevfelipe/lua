@@ -6,7 +6,7 @@ function love.load()
   objetos = {}
   
   objetos.chao = {}
-  objetos.chao.body = love.physics.newBody(mundo, 650/2, 650 - 50 / 2)
+  objetos.chao.body = love.physics.newBody(mundo, 650/2, 625)
   objetos.chao.shape = love.physics.newRectangleShape(650, 50)
   objetos.chao.fixture = love.physics.newFixture(objetos.chao.body, objetos.chao.shape)
   
@@ -18,12 +18,12 @@ function love.load()
   
   objetos.bloco1 = {}
   objetos.bloco1.body = love.physics.newBody(mundo, 200, 555, "dynamic")
-  objetos.bloco1.shape = love.physics.newRectangleShape(0,0,50,100)
+  objetos.bloco1.shape = love.physics.newRectangleShape(50,100)
   objetos.bloco1.fixture = love.physics.newFixture(objetos.bloco1.body, objetos.bloco1.shape, 5)
   
   objetos.bloco2 = {}
   objetos.bloco2.body = love.physics.newBody(mundo, 200, 400, "dynamic")
-  objetos.bloco2.shape = love.physics.newRectangleShape(0,0,100,100)
+  objetos.bloco2.shape = love.physics.newRectangleShape(100,100)
   objetos.bloco2.fixture = love.physics.newFixture(objetos.bloco2.body, objetos.bloco2.shape, 2)
   
   love.graphics.setBackgroundColor(104, 136, 248)
@@ -42,7 +42,7 @@ function love.update (dt)
   end
   
   if love.keyboard.isDown("w") then
-    objetos.bola.body:setPosition(650/2, 400)
+    objetos.bola.body:setPosition(650/2, 300)
     objetos.bola.body:setLinearVelocity(0, 0)
   end  
 end
