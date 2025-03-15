@@ -53,3 +53,11 @@ end
 function love.keyreleased(key, unicode)
    texto = "A tecla " .. key .. " foi solta."
 end
+
+function love.focus(isFocus)
+  if not isFocus then
+    love.window.setTitle("Volte aqui!")
+  else
+    love.window.setTitle("Jogo Incrível")
+  end
+end
