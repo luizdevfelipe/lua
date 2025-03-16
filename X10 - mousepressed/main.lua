@@ -43,7 +43,7 @@ function love.mousereleased(x, y, button, isTouch)
 end
 
 function love.keypressed(key, unicode)
-  if key ~= "escape" then 
+  if key ~= "escape" then
     texto = "A tecla " .. key .. " foi pressionada."
   else
     love.event.quit() 
@@ -60,4 +60,9 @@ function love.focus(isFocus)
   else
     love.window.setTitle("Jogo Incrível")
   end
+end
+
+function love.quit()
+  print("Jogou o suficiente? Volte logo")
+  love.timer.sleep(2)
 end
