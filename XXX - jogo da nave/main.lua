@@ -9,17 +9,28 @@ function love.load()
       posY = alturaTela / 2,
       velocidade = 200
   }
+  -- Nave
+  
   -- Tiros
   atira = true
   delayTiro = 0.1
   tempoAteAtirar = delayTiro
   tiros = {}
   imgTiro = love.graphics.newImage("imagens/projetil.png")
+  -- Tiros
+  
+  -- Inimigo
+  delayInimigo = 0.4
+  tempoCriarInimigo = delayInimigo
+  imgInimigo = love.graphics.newImage("imagens/inimigo.png")
+  inimigos = {}
+  -- Inimigo
 end
 
 function love.update(dt)
   movimentos(dt)
   atirar(dt)
+  inimigo(dt)
 end
 
 function atirar(dt)
@@ -64,11 +75,32 @@ function love.draw()
   -- Nave
   love.graphics.draw(imgNave, nave.posX, nave.posY, 0, 1, 1, imgNave:getWidth() / 2, imgNave:getHeight() / 2)
   -- Nave
-  
   -- Tiros
     for i, tiro in ipairs(tiros) do
       love.graphics.draw(tiro.img, tiro.x, tiro.y, 0, 1, 1, imgTiro:getWidth() / 2, imgTiro:getHeight())
     end
   -- Tiros
+  -- Inimigos
+    for i, inimigo in ipairs(inimigos) do
+      love.graphics.draw(inimigo.img, inimigo.x, inimigo.y)
+    end
+  -- Inimigos
   
+end
+
+function inimigo(dt)
+  tempoCriarInimigo = tempoCriarInimigo - 1 * dt
+  if tempoCriarInimigo < 0 then
+    tempoCriarInimigo = delayInimigo
+    numeroAleatorio = math.random(10, love.graphics.getWidth() - imgInimigo:getWidth() / 2 + 10 )
+    novoInimigo = {x = numeroAleatorio, y = -imgInimigo:getHeight(), img = imgInimigo}
+    table.insert(inimigos, novoInimigo)
+  end
+  
+  for i, inimigo in ipairs(inimigos) do
+    inimigo.y = inimigo.y + 200 * dt
+    if inimigo.x > 850 then
+      table.remove(inimigos, i)
+    end
+  end
 end
