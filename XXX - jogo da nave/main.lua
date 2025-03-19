@@ -30,6 +30,22 @@ function love.load()
   estaVivo = true
   pontos = 0
   -- Vidas e Pontuação
+  
+  -- Background
+  fundo = love.graphics.newImage("imagens/fundo.png")
+  fundoDois = love.graphics.newImage("imagens/fundo.png")
+  
+  planoDeFundo = {
+      x = 0,
+      y = 0,
+      y2 = 0 - fundo:getHeight(),
+      vel = 30
+  }
+  -- Background
+  
+  -- Fonte
+  fonte = love.graphics.newFont("fonte/PressStart2P-Regular.ttf", 13)
+  -- Fonte
 end
 
 function love.update(dt)
@@ -37,37 +53,41 @@ function love.update(dt)
   atirar(dt)
   inimigo(dt)
   colisoes()
-  
-  if not estaVivo and love.keyboard.isDown("return") then
-    tiros = {}
-    inimigos = {}
-    tempoAteAtirar = delayTiro
-    tempoCriarInimigo = delayInimigo
-    
-    nave.posX = larguraTela / 2
-    nave.posY = alturaTela / 2
-    
-    pontos = 0
-    estaVivo = true    
-  end
+  reset()  
+  scrollPlanoDeFundo(dt)
 end
 
 function love.draw()
+  -- Background
+  love.graphics.draw(fundo, planoDeFundo.x, planoDeFundo.y)
+  love.graphics.draw(fundo, planoDeFundo.x, planoDeFundo.y2)
+  -- Background  
+  
   -- Tiros
     for i, tiro in ipairs(tiros) do
       love.graphics.draw(tiro.img, tiro.x, tiro.y, 0, 1, 1, imgTiro:getWidth() / 2, imgTiro:getHeight())
     end
   -- Tiros
+  
   -- Inimigos
     for i, inimigo in ipairs(inimigos) do
       love.graphics.draw(inimigo.img, inimigo.x, inimigo.y)
     end
   -- Inimigos
+  
+  -- Pontos na Tela
+  love.graphics.setFont(fonte)
+  love.graphics.print("Pontuação: " .. pontos, 10, 10)
+  -- Pontos na Tela
+  
   -- Game Over e Reset
   if estaVivo then
     love.graphics.draw(imgNave, nave.posX, nave.posY, 0, 1, 1, imgNave:getWidth() / 2, imgNave:getHeight() / 2)
   else
-    love.graphics.print("Aperte 'Enter' para reiniciar...", larguraTela / 3, alturaTela / 2)
+    local mensagem = "Aperte 'Enter' para reiniciar..."
+    local larguraTexto = love.graphics.getFont():getWidth(mensagem)
+    local x = (larguraTela - larguraTexto) / 2
+    love.graphics.print(mensagem, x, alturaTela / 2)
   end
   -- Game Over e Reset
 end
@@ -144,4 +164,28 @@ end
 function checarColisao(x1, y1, w1, h1, x2, y2, w2, h2)
   return x1 < x2 + w2 and x2 < x1 + w1 and y1 < y2 + h2 and y2 < y1 + h1
 end
+function reset() 
+  if not estaVivo and love.keyboard.isDown("return") then
+    tiros = {}
+    inimigos = {}
+    tempoAteAtirar = delayTiro
+    tempoCriarInimigo = delayInimigo
+    
+    nave.posX = larguraTela / 2
+    nave.posY = alturaTela / 2
+    
+    pontos = 0
+    estaVivo = true    
+  end
+end
+function scrollPlanoDeFundo(dt)
+  planoDeFundo.y = planoDeFundo.y + planoDeFundo.vel * dt
+  planoDeFundo.y2 = planoDeFundo.y2 + planoDeFundo.vel * dt
   
+  if planoDeFundo.y > alturaTela then
+    planoDeFundo.y = planoDeFundo.y2 - fundoDois:getHeight()
+  end
+  if planoDeFundo.y2 > alturaTela then
+    planoDeFundo.y2 = planoDeFundo.y - fundo:getHeight()
+  end
+end
