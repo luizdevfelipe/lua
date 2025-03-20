@@ -13,7 +13,7 @@ function love.load()
   
   -- Tiros
   atira = true
-  delayTiro = 0.1
+  delayTiro = 0.3
   tempoAteAtirar = delayTiro
   tiros = {}
   imgTiro = love.graphics.newImage("imagens/projetil.png")
@@ -46,6 +46,22 @@ function love.load()
   -- Fonte
   fonte = love.graphics.newFont("fonte/PressStart2P-Regular.ttf", 13)
   -- Fonte
+  
+  -- Sons do Jogo
+  volume = 0.5
+  somDoTiro = love.audio.newSource("sons/Tiro.wav", "static")
+  explodeNave = love.audio.newSource("sons/ExplodeNave.wav", "static")
+  explodeInimigo = love.audio.newSource("sons/ExplodeInimigo.wav", "static")
+  musica = love.audio.newSource("sons/Musica.wav")
+  
+  somDoTiro:setVolume(volume)
+  explodeNave:setVolume(volume)
+  explodeInimigo:setVolume(volume)
+  musica:setVolume(volume)
+  
+  musica:play()
+  musica:setLooping(true)
+  -- Sons do Jogo
 end
 
 function love.update(dt)
@@ -101,6 +117,8 @@ function atirar(dt)
   if estaVivo and love.keyboard.isDown("space") and atira then
     novoTiro = {x = nave.posX, y = nave.posY, img = imgTiro}
     table.insert(tiros, novoTiro)
+    somDoTiro:stop()
+    somDoTiro:play()
     atira = false
     tempoAteAtirar = delayTiro
   end
@@ -152,11 +170,14 @@ function colisoes()
       if checarColisao(inimigo.x, inimigo.y, imgInimigo:getWidth(), imgInimigo:getHeight(), tiro.x, tiro.y, imgTiro:getWidth(), imgTiro:getHeight()) then
         table.remove(tiros, j)
         table.remove(inimigos, i)
+        explodeInimigo:stop()
+        explodeInimigo:play()
         pontos = pontos + 1
       end
     end
     if checarColisao(inimigo.x, inimigo.y, imgInimigo:getWidth(), imgInimigo:getHeight(), nave.posX - imgNave:getWidth() / 2, nave.posY, imgNave:getWidth(), imgNave:getHeight()) and estaVivo then
       table.remove(inimigo, i)
+      explodeNave:play()
       estaVivo = false
     end
   end
@@ -188,4 +209,21 @@ function scrollPlanoDeFundo(dt)
   if planoDeFundo.y2 > alturaTela then
     planoDeFundo.y2 = planoDeFundo.y - fundo:getHeight()
   end
+end
+function love.wheelmoved(x, y)
+  if y > 0 then
+    -- scroll pra frente
+    if volume < 1 then
+      volume = volume + 0.1
+    end
+  else
+    -- scrol pra trás
+    if volume > 0 then
+      volume = volume - 0.1
+    end
+  end
+  somDoTiro:setVolume(volume)
+  explodeNave:setVolume(volume)
+  explodeInimigo:setVolume(volume)
+  musica:setVolume(volume)
 end
