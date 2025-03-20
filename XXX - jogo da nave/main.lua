@@ -62,6 +62,11 @@ function love.load()
   musica:play()
   musica:setLooping(true)
   -- Sons do Jogo
+  
+  -- Efeitos da pontuação
+  scaleX = 1
+  scaleY = 1
+  -- Efeitos da pontuação
 end
 
 function love.update(dt)
@@ -71,6 +76,7 @@ function love.update(dt)
   colisoes()
   reset()  
   scrollPlanoDeFundo(dt)
+  efeito(dt)
 end
 
 function love.draw()
@@ -93,7 +99,8 @@ function love.draw()
   
   -- Pontos na Tela
   love.graphics.setFont(fonte)
-  love.graphics.print("Pontuação: " .. pontos, 10, 10)
+  love.graphics.print("Pontuação: ", 10, 10)
+  love.graphics.print(pontos, love.graphics.getFont():getWidth("Pontuação: ") + 5, 10, 0, scaleX, scaleY)
   -- Pontos na Tela
   
   -- Game Over e Reset
@@ -173,6 +180,8 @@ function colisoes()
         explodeInimigo:stop()
         explodeInimigo:play()
         pontos = pontos + 1
+        scaleX = 1.5
+        scaleY = 1.5
       end
     end
     if checarColisao(inimigo.x, inimigo.y, imgInimigo:getWidth(), imgInimigo:getHeight(), nave.posX - imgNave:getWidth() / 2, nave.posY, imgNave:getWidth(), imgNave:getHeight()) and estaVivo then
@@ -226,4 +235,10 @@ function love.wheelmoved(x, y)
   explodeNave:setVolume(volume)
   explodeInimigo:setVolume(volume)
   musica:setVolume(volume)
+end
+function efeito(dt)
+  if scaleX > 1 and scaleY > 1 then
+    scaleX = scaleX - 3 * dt
+    scaleY = scaleY - 3 * dt
+  end
 end
