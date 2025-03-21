@@ -67,6 +67,13 @@ function love.load()
   scaleX = 1
   scaleY = 1
   -- Efeitos da pontuação
+  
+  -- Tela Inicial
+  abreTela = false
+  telaInicial = love.graphics.newImage("imagens/tela_inicial.png")
+  inicialX = 0
+  inicialY = 0
+  -- Tela Inicial
 end
 
 function love.update(dt)
@@ -77,6 +84,7 @@ function love.update(dt)
   reset()  
   scrollPlanoDeFundo(dt)
   efeito(dt)
+  iniciaJogo(dt)
 end
 
 function love.draw()
@@ -107,10 +115,7 @@ function love.draw()
   if estaVivo then
     love.graphics.draw(imgNave, nave.posX, nave.posY, 0, 1, 1, imgNave:getWidth() / 2, imgNave:getHeight() / 2)
   else
-    local mensagem = "Aperte 'Enter' para reiniciar..."
-    local larguraTexto = love.graphics.getFont():getWidth(mensagem)
-    local x = (larguraTela - larguraTexto) / 2
-    love.graphics.print(mensagem, x, alturaTela / 2)
+    love.graphics.draw(telaInicial, inicialX, inicialY)
   end
   -- Game Over e Reset
 end
@@ -188,6 +193,7 @@ function colisoes()
       table.remove(inimigo, i)
       explodeNave:play()
       estaVivo = false
+      abreTela = false
     end
   end
 end 
@@ -205,7 +211,7 @@ function reset()
     nave.posY = alturaTela / 2
     
     pontos = 0
-    estaVivo = true    
+    abreTela = true    
   end
 end
 function scrollPlanoDeFundo(dt)
@@ -240,5 +246,21 @@ function efeito(dt)
   if scaleX > 1 and scaleY > 1 then
     scaleX = scaleX - 3 * dt
     scaleY = scaleY - 3 * dt
+  end
+end
+function iniciaJogo(dt)
+  if abreTela and not estaVivo then
+    inicialX = inicialX + 600 * dt
+    if inicialX > 401 then
+      inicialY = -701
+      inicialX = 0
+      estaVivo = true
+    end
+  elseif not abreTela then
+    estaVivo = false
+    inicialY = inicialY + 600 * dt
+    if inicialY > 0 then
+      inicialY = 0
+    end
   end
 end
