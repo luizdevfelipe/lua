@@ -74,17 +74,23 @@ function love.load()
   inicialX = 0
   inicialY = 0
   -- Tela Inicial
+  
+  -- Pause
+  pausar = false
+  -- Pause
 end
 
 function love.update(dt)
-  movimentos(dt)
-  atirar(dt)
-  inimigo(dt)
-  colisoes()
-  reset()  
-  scrollPlanoDeFundo(dt)
-  efeito(dt)
-  iniciaJogo(dt)
+  if not pausar then
+    movimentos(dt)
+    atirar(dt)
+    inimigo(dt)
+    colisoes()
+    reset()  
+    scrollPlanoDeFundo(dt)
+    efeito(dt)
+    iniciaJogo(dt)
+  end
 end
 
 function love.draw()
@@ -263,4 +269,16 @@ function iniciaJogo(dt)
       inicialY = 0
     end
   end
+end
+function love.keyreleased(key)
+  if key == "escape" and abreTela then
+    pausar = not pausar
+  end
+  if pausar then
+    musica:pause()
+  else
+    musica:play()
+    -- love.audio.resume(musica)
+  end
+  
 end
