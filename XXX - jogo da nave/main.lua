@@ -29,6 +29,10 @@ function love.load()
   -- Vidas e Pontuação
   estaVivo = true
   pontos = 0
+  vidas = 5
+  gameOver = false
+  transparencia = 0
+  imgGameOver = love.graphics.newImage("imagens/game_over.png")
   -- Vidas e Pontuação
   
   -- Background
@@ -90,36 +94,46 @@ function love.update(dt)
     scrollPlanoDeFundo(dt)
     efeito(dt)
     iniciaJogo(dt)
+    
+  end
+  if gameOver then
+    fimJogo(dt)
   end
 end
 
 function love.draw()
-  -- Background
-  love.graphics.draw(fundo, planoDeFundo.x, planoDeFundo.y)
-  love.graphics.draw(fundo, planoDeFundo.x, planoDeFundo.y2)
-  -- Background  
-  
-  -- Tiros
-    for i, tiro in ipairs(tiros) do
-      love.graphics.draw(tiro.img, tiro.x, tiro.y, 0, 1, 1, imgTiro:getWidth() / 2, imgTiro:getHeight())
-    end
-  -- Tiros
-  
-  -- Inimigos
-    for i, inimigo in ipairs(inimigos) do
-      love.graphics.draw(inimigo.img, inimigo.x, inimigo.y)
-    end
-  -- Inimigos
-  
-  -- Pontos na Tela
-  love.graphics.setFont(fonte)
-  love.graphics.print("Pontuação: ", 10, 10)
-  love.graphics.print(pontos, love.graphics.getFont():getWidth("Pontuação: ") + 5, 10, 0, scaleX, scaleY)
-  -- Pontos na Tela
-  
+  if not gameOver then 
+    -- Background
+    love.graphics.draw(fundo, planoDeFundo.x, planoDeFundo.y)
+    love.graphics.draw(fundo, planoDeFundo.x, planoDeFundo.y2)
+    -- Background  
+    
+    -- Tiros
+      for i, tiro in ipairs(tiros) do
+        love.graphics.draw(tiro.img, tiro.x, tiro.y, 0, 1, 1, imgTiro:getWidth() / 2, imgTiro:getHeight())
+      end
+    -- Tiros
+    
+    -- Inimigos
+      for i, inimigo in ipairs(inimigos) do
+        love.graphics.draw(inimigo.img, inimigo.x, inimigo.y)
+      end
+    -- Inimigos
+    
+    -- Pontos na Tela
+    love.graphics.setFont(fonte)
+    love.graphics.print("Pontuação: ", 10, 10)
+    love.graphics.print(pontos, love.graphics.getFont():getWidth("Pontuação: ") + 5, 10, 0, scaleX, scaleY)
+    mostraVidas = "Vidas: " .. vidas
+    love.graphics.print(mostraVidas, larguraTela - love.graphics.getFont():getWidth(mostraVidas) ,10)
+    -- Pontos na Tela
+  end
   -- Game Over e Reset
   if estaVivo then
     love.graphics.draw(imgNave, nave.posX, nave.posY, 0, 1, 1, imgNave:getWidth() / 2, imgNave:getHeight() / 2)
+  elseif gameOver then
+    love.graphics.setColor(255, 255, 255, transparencia)
+    love.graphics.draw(imgGameOver, 0, 0)
   else
     love.graphics.draw(telaInicial, inicialX, inicialY)
   end
@@ -200,6 +214,10 @@ function colisoes()
       explodeNave:play()
       estaVivo = false
       abreTela = false
+      vidas = vidas - 1
+      if vidas < 0 then
+        gameOver = true
+      end
     end
   end
 end 
@@ -271,7 +289,7 @@ function iniciaJogo(dt)
   end
 end
 function love.keyreleased(key)
-  if key == "escape" and abreTela then
+  if key == "p" and abreTela then
     pausar = not pausar
   end
   if pausar then
@@ -281,4 +299,12 @@ function love.keyreleased(key)
     -- love.audio.resume(musica)
   end
   
+end
+function fimJogo(dt)
+  pausar = true
+  musica:stop()
+  transparencia = transparencia + 20 * dt
+  if love.keyboard.isDown("escape") then
+    love.event.quit()
+  end
 end
