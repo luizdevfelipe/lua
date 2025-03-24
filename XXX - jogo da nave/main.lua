@@ -1,6 +1,8 @@
 larguraTela = love.graphics.getWidth()
 alturaTela = love.graphics.getHeight()
 
+anim = require("anim8")
+
 function love.load()
   -- Nave
   imgNave = love.graphics.newImage("imagens/nave.png")  
@@ -82,6 +84,22 @@ function love.load()
   -- Pause
   pausar = false
   -- Pause
+  
+  -- Mega Bomba
+  bombaVazia = love.graphics.newImage("imagens/BombaVazia.png")
+  bombaCheia = love.graphics.newImage("imagens/BombaCheia.png")
+  bombaCheiaAviso = love.graphics.newImage("imagens/BombaCheiaAviso.png")
+  explosao = love.graphics.newImage("imagens/Explosao.png")
+  somExplosao = love.audio.newSource("sons/Explosao.mp3")
+  
+  explodir = {}
+  podeExplodir = false
+  carregador = 0
+  animaAviso = 0.8
+  
+  local g = anim.newGrid(192, 192, explosao:getWidth(), explosao:getHeight())
+  animation = anim.newAnimation(g('1-5', 2, '1-5', 3, '1-5', 4, '1-4', 5), 0.09, destroi)
+  -- Mega Bomba
 end
 
 function love.update(dt)
@@ -94,7 +112,8 @@ function love.update(dt)
     scrollPlanoDeFundo(dt)
     efeito(dt)
     iniciaJogo(dt)
-    
+    controlaExplosao(dt)
+    bombaPronta(dt)
   end
   if gameOver then
     fimJogo(dt)
@@ -119,6 +138,18 @@ function love.draw()
         love.graphics.draw(inimigo.img, inimigo.x, inimigo.y)
       end
     -- Inimigos
+    
+    -- Mega Bomba
+    for i = 1, #explodir do 
+      animation:draw(explosao, larguraTela / 2, alturaTela / 2, 0, 4, 4, 96, 96)
+    end
+    love.graphics.draw(bombaVazia, larguraTela / 2, 50, 0, 1, 1, bombaVazia:getWidth()/2, bombaVazia:getHeight()/2)
+    love.graphics.draw(bombaCheia, larguraTela / 2, 50, 0, carregador, carregador, bombaCheia:getWidth()/2, bombaCheia:getHeight() / 2)
+    
+    if podeExplodir then
+      love.graphics.draw(bombaCheiaAviso, larguraTela/2, 50, 0, animaAviso, animaAviso, bombaCheiaAviso:getWidth() / 2, bombaCheiaAviso:getHeight() / 2)
+    end
+    -- Mega Bomba
     
     -- Pontos na Tela
     love.graphics.setFont(fonte)
@@ -206,7 +237,12 @@ function colisoes()
         explodeInimigo:play()
         pontos = pontos + 1
         scaleX = 1.5
-        scaleY = 1.5
+        scaleY = 1.5        
+        if carregador >= 1 then
+          podeExplodir = true
+        else
+          carregador = carregador + 0.1
+        end
       end
     end
     if checarColisao(inimigo.x, inimigo.y, imgInimigo:getWidth(), imgInimigo:getHeight(), nave.posX - imgNave:getWidth() / 2, nave.posY, imgNave:getWidth(), imgNave:getHeight()) and estaVivo then
@@ -265,6 +301,7 @@ function love.wheelmoved(x, y)
   explodeNave:setVolume(volume)
   explodeInimigo:setVolume(volume)
   musica:setVolume(volume)
+  somExplosao :setVolume(volume)
 end
 function efeito(dt)
   if scaleX > 1 and scaleY > 1 then
@@ -298,6 +335,17 @@ function love.keyreleased(key)
     musica:play()
     -- love.audio.resume(musica)
   end
+  if key == "e" and podeExplodir then
+    novaExplosao = {}
+    table.insert(explodir, novaExplosao)
+    somExplosao:play()
+    carregador = 0
+    for i = 1, #inimigos do
+      pontos = pontos + 1
+    end
+    inimigos = {}
+    podeExplodir = false
+  end
   
 end
 function fimJogo(dt)
@@ -306,5 +354,22 @@ function fimJogo(dt)
   transparencia = transparencia + 20 * dt
   if love.keyboard.isDown("escape") then
     love.event.quit()
+  end
+end
+function controlaExplosao(dt)
+  for i = 1, #explodir do
+    animation:update(dt)
+  end
+end
+function bombaPronta(dt)  
+  if animaAviso < 1 then
+    animaAviso = animaAviso + 0.5 * dt
+  else
+    animaAviso = 0.8
+  end
+end
+function destroi()
+  for i = 1, #explodir do
+    table.remove(explodir, i)
   end
 end
