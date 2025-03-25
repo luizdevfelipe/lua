@@ -51,6 +51,7 @@ function love.load()
   
   -- Fonte
   fonte = love.graphics.newFont("fonte/PressStart2P-Regular.ttf", 13)
+  fonteDois = love.graphics.newFont("fonte/PressStart2P-Regular.ttf", 20)
   -- Fonte
   
   -- Sons do Jogo
@@ -180,6 +181,9 @@ function love.draw()
   elseif gameOver then
     love.graphics.setColor(255, 255, 255, transparencia)
     love.graphics.draw(imgGameOver, 0, 0)
+    love.graphics.setFont(fonteDois)
+    xPontosTotais = (larguraTela/2)-(love.graphics.getFont():getWidth("PONTOS TOTAIS:   ") / 2)
+    love.graphics.print("PONTOS TOTAIS: " .. pontos, xPontosTotais, 50)
   else
     love.graphics.draw(telaInicial, inicialX, inicialY)
   end
@@ -279,7 +283,7 @@ function checarColisao(x1, y1, w1, h1, x2, y2, w2, h2)
   return x1 < x2 + w2 and x2 < x1 + w1 and y1 < y2 + h2 and y2 < y1 + h1
 end
 function reset() 
-  if not estaVivo and love.keyboard.isDown("return") then
+  if not estaVivo and inicialY == 0 and love.keyboard.isDown("return") then
     tiros = {}
     inimigos = {}
     tempoAteAtirar = delayTiro
@@ -287,8 +291,7 @@ function reset()
     
     nave.posX = larguraTela / 2
     nave.posY = alturaTela / 2
-    
-    pontos = 0
+  
     abreTela = true    
   end
 end
@@ -353,7 +356,7 @@ function love.keyreleased(key)
     musica:play()
     -- love.audio.resume(musica)
   end
-  if key == "e" and podeExplodir then
+  if key == "e" and podeExplodir and not gameOver then
     novaExplosao = {}
     table.insert(explodir, novaExplosao)
     somExplosao:play()
