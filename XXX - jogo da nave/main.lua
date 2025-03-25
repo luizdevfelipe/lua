@@ -100,6 +100,14 @@ function love.load()
   local g = anim.newGrid(192, 192, explosao:getWidth(), explosao:getHeight())
   animation = anim.newAnimation(g('1-5', 2, '1-5', 3, '1-5', 4, '1-4', 5), 0.09, destroi)
   -- Mega Bomba
+  
+  -- Destroi Inimigo
+  expInimigo = {}
+  expInimigo.x = 0
+  expInimigo.y = 0
+  local gride = anim.newGrid(192, 192, explosao:getWidth(), explosao:getHeight())
+  destroiInimigo = anim.newAnimation(gride('1-5', 4, '1-4', 5), 0.01, destroiDois)
+  -- Destroi Inimigo
 end
 
 function love.update(dt)
@@ -114,6 +122,7 @@ function love.update(dt)
     iniciaJogo(dt)
     controlaExplosao(dt)
     bombaPronta(dt)
+    explosaoInimigo(dt)
   end
   if gameOver then
     fimJogo(dt)
@@ -138,6 +147,12 @@ function love.draw()
         love.graphics.draw(inimigo.img, inimigo.x, inimigo.y)
       end
     -- Inimigos
+    
+    -- Destroi Inimigo
+    for i = 1, #expInimigo do
+      destroiInimigo:draw(explosao, expInimigo.x, expInimigo.y, 0, 0.4, 0.4, 96, 96)
+    end
+    -- Destroi Inimigo
     
     -- Mega Bomba
     for i = 1, #explodir do 
@@ -232,6 +247,9 @@ function colisoes()
     for j, tiro in ipairs(tiros) do
       if checarColisao(inimigo.x, inimigo.y, imgInimigo:getWidth(), imgInimigo:getHeight(), tiro.x, tiro.y, imgTiro:getWidth(), imgTiro:getHeight()) then
         table.remove(tiros, j)
+        expInimigo.x = inimigo.x
+        expInimigo.y = inimigo.y
+        table.insert(expInimigo, destroiInimigo)
         table.remove(inimigos, i)
         explodeInimigo:stop()
         explodeInimigo:play()
@@ -371,5 +389,15 @@ end
 function destroi()
   for i = 1, #explodir do
     table.remove(explodir, i)
+  end
+end
+function explosaoInimigo(dt)
+  for i = 1, #expInimigo do
+    destroiInimigo:update(dt)
+  end
+end
+function destroiDois()
+  for i = 1, #expInimigo do
+    table.remove(expInimigo, i)
   end
 end
