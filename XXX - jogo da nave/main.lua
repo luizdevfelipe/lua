@@ -31,7 +31,7 @@ function love.load()
   -- Vidas e Pontuação
   estaVivo = true
   pontos = 0
-  vidas = 5
+  vidas = 3
   gameOver = false
   transparencia = 0
   imgGameOver = love.graphics.newImage("imagens/game_over.png")
@@ -199,6 +199,24 @@ function atirar(dt)
   if estaVivo and love.keyboard.isDown("space") and atira then
     novoTiro = {x = nave.posX, y = nave.posY, img = imgTiro}
     table.insert(tiros, novoTiro)
+    if pontos > 20 then
+      novoTiro1 = {x = nave.posX + 10, y = nave.posY + 15, img = imgTiro}
+      table.insert(tiros, novoTiro1)
+      novoTiro2 = {x = nave.posX - 10, y = nave.posY + 15, img = imgTiro}
+      table.insert(tiros, novoTiro2)
+      delayTiro = 0.4
+      if pontos > 50 then
+        novoTiro3 = {x = nave.posX + 20, y = nave.posY + 20, img = imgTiro}
+        table.insert(tiros, novoTiro3)
+        novoTiro4 = {x = nave.posX - 20, y = nave.posY + 20, img = imgTiro}
+        table.insert(tiros, novoTiro4)
+        delayTiro = 0.3
+        if pontos > 100 then
+          delayInimigo = 0.1
+          delayTiro = 0.2
+        end
+      end
+    end
     somDoTiro:stop()
     somDoTiro:play()
     atira = false
